@@ -2,6 +2,14 @@
 
 > **Send Money Instantly. Never Lose a Cent.**
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-payflow--tan--phi.vercel.app-0070BA?style=for-the-badge&logo=vercel&logoColor=white)](https://payflow-tan-phi.vercel.app)
+[![API Status](https://img.shields.io/badge/Backend_API-Render_Live-22c55e?style=for-the-badge&logo=render&logoColor=white)](https://payflow-backend-a8m4.onrender.com/api/health)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas_ReplicaSet-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+
+🔗 **Live Deployment:** [https://payflow-tan-phi.vercel.app](https://payflow-tan-phi.vercel.app)  
+📡 **Live Backend API:** [https://payflow-backend-a8m4.onrender.com/api](https://payflow-backend-a8m4.onrender.com/api)
+
 PayFlow is a high-integrity digital wallet and peer-to-peer (P2P) payment platform engineered with an authentic **PayPal-inspired web and mobile interface**. Built to demonstrate financial transaction correctness, strict concurrency control, double-spend prevention, and a signature **10-second payment undo window**.
 
 ---
@@ -95,7 +103,7 @@ Once the 10-second grace window expires without cancellation, the background set
 ### 2. Installation
 Clone the repository and install dependencies:
 ```bash
-git clone https://github.com/your-username/payflow.git
+git clone https://github.com/Amit-Shukla07/payflow.git
 cd payflow
 npm install
 ```
