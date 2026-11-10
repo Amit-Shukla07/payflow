@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import { env } from './config/env.js';
 import apiRoutes from './routes/index.js';
+import { healthController } from './controllers/health.controller.js';
 import { errorHandler } from './middleware/error.middleware.js';
 import { NotFoundError } from './utils/errors.js';
 
@@ -55,6 +56,15 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 if (env.NODE_ENV !== 'test') {
   app.use(morgan('combined'));
 }
+
+// Root and health checks for hosting providers (Render, AWS, Railway)
+app.get('/health', healthController.check);
+app.get('/', (req: Request, res: Response) => {
+  res.status(200).json({ status: 'ok', name: 'PayFlow API', version: '1.0.0' });
+});
+app.head('/', (req: Request, res: Response) => {
+  res.status(200).end();
+});
 
 // Mount API routes
 app.use('/api', apiRoutes);
