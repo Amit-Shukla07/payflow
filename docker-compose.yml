@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: payflow-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mongo-init:
+    image: mongo:7.0
+    container_name: payflow-mongo-init
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: "no"
+    command: >
+      bash -c "
+        echo 'Initiating MongoDB Replica Set rs0...';
+        mongosh --host mongo:27017 --eval '
+          try {
+            rs.status();
+            console.log(\"Replica set already initialized.\");
+          } catch (e) {
+            rs.initiate({
+              _id: \"rs0\",
+              members: [{ _id: 0, host: \"mongo:27017\" }]
+            });
+            console.log(\"Replica set rs0 initialized successfully.\");
+          }
+        ';
+      "
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: payflow-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - MONGODB_URI=mongodb://mongo:27017/payflow?replicaSet=rs0
+      - JWT_SECRET=payflow-super-secure-production-secret-token-32-chars-min!
+      - JWT_EXPIRES_IN=24h
+      - CORS_ORIGIN=http://localhost:5173
+      - RATE_LIMIT_WINDOW_MS=900000
+      - RATE_LIMIT_MAX=500
+    depends_on:
+      mongo-init:
+        condition: service_completed_successfully
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: payflow-frontend
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data:
+
