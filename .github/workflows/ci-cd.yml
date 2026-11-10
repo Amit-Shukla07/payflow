@@ -1,0 +1,103 @@
+name: PayFlow CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  # ==========================================
+  # 1. BACKEND CI: Build & Test
+  # ==========================================
+  backend-ci:
+    name: Backend CI (TypeScript & Tests)
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: TypeScript Build Check
+        run: npm run build
+
+      - name: Run Vitest Suite (Unit, Integration & ACID Concurrency)
+        run: npm test
+
+  # ==========================================
+  # 2. FRONTEND CI: Build & Type Check
+  # ==========================================
+  frontend-ci:
+    name: Frontend CI (Vite & TypeScript)
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Production Bundle
+        run: npm run build
+
+  # ==========================================
+  # 3. CONTINUOUS DEPLOYMENT (CD) HEALTH VERIFICATION
+  # ==========================================
+  deploy-health-check:
+    name: Production Deployment Verification
+    needs: [backend-ci, frontend-ci]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Verify Live Render Backend Health
+        run: |
+          echo "Pinging Live Backend API..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://payflow-backend-a8m4.onrender.com/api/health)
+          echo "Backend Health HTTP status: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "✅ Render Backend is Healthy & Connected to MongoDB Atlas."
+          else
+            echo "⚠️ Warning: Backend health check returned status $HTTP_STATUS (may still be deploying or waking up)."
+          fi
+
+      - name: Verify Live Vercel Frontend Health
+        run: |
+          echo "Pinging Live Frontend App..."
+          FRONTEND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://payflow-tan-phi.vercel.app/)
+          echo "Frontend HTTP status: $FRONTEND_STATUS"
+          if [ "$FRONTEND_STATUS" -eq 200 ]; then
+            echo "✅ Vercel Frontend is Live and serving PayFlow app."
+          else
+            echo "⚠️ Warning: Frontend returned status $FRONTEND_STATUS"
+          fi

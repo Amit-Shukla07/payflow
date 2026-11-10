@@ -3,6 +3,7 @@
 > **Send Money Instantly. Never Lose a Cent.**
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-payflow--tan--phi.vercel.app-0070BA?style=for-the-badge&logo=vercel&logoColor=white)](https://payflow-tan-phi.vercel.app)
+[![CI/CD Pipeline](https://github.com/Amit-Shukla07/payflow/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Amit-Shukla07/payflow/actions/workflows/ci-cd.yml)
 [![API Status](https://img.shields.io/badge/Backend_API-Render_Live-22c55e?style=for-the-badge&logo=render&logoColor=white)](https://payflow-backend-a8m4.onrender.com/api/health)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas_ReplicaSet-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
