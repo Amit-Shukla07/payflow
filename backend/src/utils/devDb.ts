@@ -7,11 +7,11 @@ async function start() {
       name: 'rs0',
       count: 1,
       storageEngine: 'wiredTiger',
+      dbName: 'payflow',
     },
     instanceOpts: [
       {
         port: 27017,
-        dbName: 'payflow',
       },
     ],
   });
